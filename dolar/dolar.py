@@ -35,9 +35,9 @@ def split_sequence(sequence, n_steps):
     return numpy.array(X), numpy.array(y)
 
 # download most recent data from datos.gob.ar
-# download_usd()
+#download_usd()
 
-data = pd.read_csv("dolar.csv")
+data = pd.read_csv("./dolar.csv")
 historic_data = data.tipo_cambio_bna_vendedor.values[:-20]
 
 # choose a number of time steps
@@ -69,27 +69,35 @@ model.fit(X, y, epochs=n_epochs, verbose=0)
 # predict dolar 🐬
 predicted_values = []
 last_predicted = data.tipo_cambio_bna_vendedor.values[-4:]
+print(last_predicted)
 n_values_to_predict = 24
 
 for x in range(n_values_to_predict):
     x_input = last_predicted.reshape((1, n_seq, n_steps, n_features))
     y = model.predict(x_input, verbose=0)
     y_predicted = y.flatten()[0]
+    print("y_predicted")
+    print(y_predicted)
     predicted_values.append(y_predicted)
     # calculate next batch of samples for prediction,
     # including the last prediction we just did.
     last_predicted = last_predicted[1:]
     last_predicted = numpy.append(last_predicted, [y])
+    print("last_predicted")
+    print(last_predicted)
+
+
+print("tipo_cambio_bna_vendedor values: " + str(data.tipo_cambio_bna_vendedor))
 
 print("Predicted values: " + str(predicted_values))
 
 
-pyplot.title("Historico")
-pyplot.plot(data.tipo_cambio_bna_vendedor)
-pyplot.xlabel('Indice Tiempo')
-pyplot.ylabel('Indice Dolar')
-pyplot.show()
-
-pyplot.title("Prediccion " + str(n_values_to_predict) + " Días")
-pyplot.plot(predicted_values)
-pyplot.show()
+#pyplot.title("Historico")
+#pyplot.plot(data.tipo_cambio_bna_vendedor)
+#pyplot.xlabel('Indice Tiempo')
+#pyplot.ylabel('Indice Dolar')
+#pyplot.show()
+#
+#pyplot.title("Prediccion " + str(n_values_to_predict) + " Días")
+#pyplot.plot(predicted_values)
+#pyplot.show()

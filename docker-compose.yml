@@ -1,0 +1,19 @@
+version: "3.5"
+
+services:
+  python-v1:
+    restart: unless-stopped
+    image: python-image
+    build: .
+    container_name: python-v1
+    ports:
+      - "8000:8000"
+    volumes: 
+      - ./:/app
+#    networks:
+#      - nginx_default
+#
+#networks:
+#  nginx_default:
+#    external: true
+

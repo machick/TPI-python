@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from dolar import dolar
 import json
 
 # Abre el archivo JSON y carga los datos
-with open('dolar/dolar.json', 'r') as json_file:
-    dolars = json.load(json_file)
+#with open('dolar/dolar.json', 'r') as json_file:
+#   dolars = json.load(json_file)
 
 app = FastAPI()
 
@@ -26,9 +27,10 @@ items = [1]
 
 @app.get("/")
 async def get_initial():
+    return {"hola":"Mundo"}
         # Accede a los datos del archivo JSON
-    filtered_data = [item for item in dolars if item["source"] == "Blue"]
-
+    #filtered_data = [item for item in dolars if item["source"] == "Blue"]
+    
     # valor_dolar = data["valor_dolar"]
     
     # fecha = data["fecha"]
@@ -36,8 +38,8 @@ async def get_initial():
     # Imprime los datos
     # print("Valor del dólar:", valor_dolar)
     #print("Fecha:", fecha)
-
-    return {"hola":filtered_data}
+    
+    #return {"hola":filtered_data}
 
 # Ruta para obtener todos los elementos
 @app.get("/items/")
@@ -49,3 +51,11 @@ async def get_items():
 async def create_item(item: dict):
     items.append(item)
     return item
+
+@app.get("/dolar/")
+async def get_dolar():
+    return {"hola": dolar.getDollarPrediction()}
+
+@app.get("/saludo/")
+async def getSaludo():
+    return dolar.getSaludo()

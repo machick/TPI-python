@@ -42,7 +42,7 @@ def getSaludo():
     return {"dolar": "Hola soy el dolar"}
 
 def getDollarTraining():
-    data = pd.read_csv("./dolar.csv")
+    data = pd.read_csv("./dolar/dolar.csv")
     historic_data = data.tipo_cambio_a3500.values[:-20]
 
     # choose a number of time steps
@@ -82,7 +82,7 @@ def getDollar():
     model = load_model('dolar_model')
     # predict dolar 🐬
     predicted_values = []
-    data = pd.read_csv("./dolar.csv")
+    data = pd.read_csv("./dolar/dolar.csv")
     last_predicted = data.tipo_cambio_a3500.values[-4:]
     print(last_predicted)
     n_values_to_predict = 7

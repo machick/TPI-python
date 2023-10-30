@@ -54,7 +54,11 @@ async def create_item(item: dict):
 
 @app.get("/dolar/")
 async def get_dolar():
-    return {"hola": dolar.getDollarPrediction()}
+    return {"dolar": dolar.getDollar()}
+
+@app.get("/dolar-training/")
+async def get_dolar_training():
+    return {dolar.getDollarTraining()}
 
 @app.get("/saludo/")
 async def getSaludo():

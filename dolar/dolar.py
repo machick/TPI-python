@@ -5,7 +5,8 @@ import requests
 import tensorflow as keras
 from keras import Sequential
 from keras.layers import LSTM, Dense, Flatten, TimeDistributed, Conv1D, MaxPooling1D
-
+from keras.models import load_model
+from datetime import datetime, timedelta
 
 # data preparation
 def download_usd():
@@ -33,12 +34,13 @@ def split_sequence(sequence, n_steps):
     return numpy.array(X), numpy.array(y)
 
 # download most recent data from datos.gob.ar
-#download_usd()
+
 
 def getSaludo():
+    download_usd()
     return {"dolar": "Hola soy el dolar"}
 
-def getDollarPrediction():
+def getDollarTraining():
     data = pd.read_csv("./dolar.csv")
     historic_data = data.tipo_cambio_a3500.values[:-20]
 
@@ -67,11 +69,20 @@ def getDollarPrediction():
 
     # model training
     model.fit(X, y, epochs=n_epochs, verbose=0)
+    model.save('dolar_model')
 
+    return str("Entrenamiento Finalizado")
 
+def getDollar():
+    n_features = 1
+    n_seq = 2
+    n_steps = 2
+
+    model = load_model('dolar_model')
     # predict dolar 🐬
     predicted_values = []
-    last_predicted = data.tipo_cambio_bna_vendedor.values[-4:]
+    data = pd.read_csv("./dolar.csv")
+    last_predicted = data.tipo_cambio_a3500.values[-4:]
     print(last_predicted)
     n_values_to_predict = 7
 
@@ -79,21 +90,22 @@ def getDollarPrediction():
         x_input = last_predicted.reshape((1, n_seq, n_steps, n_features))
         y = model.predict(x_input, verbose=0)
         y_predicted = y.flatten()[0]
-        print("y_predicted")
-        print(y_predicted)
-        predicted_values.append(y_predicted)
+        date_now  = datetime.now()
+        next_date = datetime.now() + timedelta(x)
+        date_ = next_date.strftime("%Y-%m-%d")
+        predicted_values.append({"fecha":date_,"precio":y_predicted})
         # calculate next batch of samples for prediction,
         # including the last prediction we just did.
         last_predicted = last_predicted[1:]
         last_predicted = numpy.append(last_predicted, [y])
-        print("last_predicted")
+        print("predicted_price")
         print(last_predicted)
 
 
-    print("tipo_cambio_bna_vendedor values: " + str(data.tipo_cambio_bna_vendedor))
+    #print("tipo_cambio_bna_vendedor values: " + str(data.tipo_cambio_bna_vendedor))
 
-    print("Predicted values: " + str(predicted_values))
-    return str(predicted_values)
+   # print("Predicted values: " + str(predicted_values))
+    return  str(predicted_values)
 
     #pyplot.title("Historico")
     #pyplot.plot(data.tipo_cambio_bna_vendedor)

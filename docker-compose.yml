@@ -6,14 +6,14 @@ services:
     image: python-image
     build: .
     container_name: python-v1
-    ports:
-      - "8000:8000"
+    #ports:
+    #  - "8000:8000"
     volumes: 
       - ./:/app
-    #networks:
-    #  - nginx_default
+    networks:
+      - nginx_default
 
-#networks:
-#  nginx_default:
-#    external: true
+networks:
+  nginx_default:
+    external: true
 

@@ -1,4 +1,5 @@
-from matplotlib import pyplot
+#from matplotlib import pyplot
+#import os
 import numpy
 import pandas as pd
 import requests
@@ -6,7 +7,8 @@ import tensorflow as keras
 from keras import Sequential
 from keras.layers import LSTM, Dense, Flatten, TimeDistributed, Conv1D, MaxPooling1D
 
-
+#os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+print("SE INICIA")
 # data preparation
 def download_usd():
     url = 'http://infra.datos.gob.ar/catalog/sspm/dataset/168/distribution/168.1/download/datos-tipo-cambio-usd-futuro-dolar-frecuencia-diaria.csv'
@@ -104,3 +106,4 @@ def getDollarPrediction():
     #pyplot.title("Prediccion " + str(n_values_to_predict) + " Días")
     #pyplot.plot(predicted_values)
     #pyplot.show()
+print("SE INICIO")

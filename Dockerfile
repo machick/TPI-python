@@ -21,4 +21,4 @@ RUN pip install --no-cache-dir \
 RUN pip install --upgrade fastapi pydantic typing-extensions
 
 EXPOSE 8000
-ENTRYPOINT uvicorn main:app --reload
+ENTRYPOINT uvicorn --host 0.0.0.0 main:app --reload --port 8000

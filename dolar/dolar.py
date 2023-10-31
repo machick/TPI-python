@@ -7,6 +7,7 @@ from keras import Sequential
 from keras.layers import LSTM, Dense, Flatten, TimeDistributed, Conv1D, MaxPooling1D
 from keras.models import load_model
 from datetime import datetime, timedelta
+import json
 
 # data preparation
 def download_usd():
@@ -40,9 +41,10 @@ def getSaludo():
     download_usd()
     return {"dolar": "Hola soy el dolar"}
 
-def getDollarTraining():
+def getDolarTraining():
     data = pd.read_csv("./dolar.csv")
-    historic_data = data.tipo_cambio_a3500.values[:-20]
+    data['futuro_rofex_usd6m'] = data['futuro_rofex_usd6m'].fillna(data['futuro_rofex_usd6m'].median())
+    historic_data = data.futuro_rofex_usd6m.values[:-20]
 
     # choose a number of time steps
     n_steps = 4
@@ -73,7 +75,7 @@ def getDollarTraining():
 
     return str("Entrenamiento Finalizado")
 
-def getDollar():
+def getDolar():
     n_features = 1
     n_seq = 2
     n_steps = 2
@@ -82,30 +84,36 @@ def getDollar():
     # predict dolar 🐬
     predicted_values = []
     data = pd.read_csv("./dolar.csv")
-    last_predicted = data.tipo_cambio_a3500.values[-4:]
-    print(last_predicted)
+    data['futuro_rofex_usd6m'] = data['futuro_rofex_usd6m'].fillna(data['futuro_rofex_usd6m'].median())
+    last_predicted = data.futuro_rofex_usd6m.values[-4:]
     n_values_to_predict = 7
 
+    class Precio:
+        def __init__(self, fecha, precio):
+            self.fecha = fecha
+            self.precio = precio
+
     for x in range(n_values_to_predict):
+        print(last_predicted)
         x_input = last_predicted.reshape((1, n_seq, n_steps, n_features))
         y = model.predict(x_input, verbose=0)
-        y_predicted = y.flatten()[0]
-        date_now  = datetime.now()
+        print(y.flatten()[0])
+        y_predicted =float(y.flatten()[0])
         next_date = datetime.now() + timedelta(x)
         date_ = next_date.strftime("%Y-%m-%d")
-        predicted_values.append({"fecha":date_,"precio":y_predicted})
+        precio = Precio(date_,y_predicted)
+        predicted_values.append(precio)
         # calculate next batch of samples for prediction,
         # including the last prediction we just did.
         last_predicted = last_predicted[1:]
         last_predicted = numpy.append(last_predicted, [y])
-        print("predicted_price")
-        print(last_predicted)
 
-
-    #print("tipo_cambio_bna_vendedor values: " + str(data.tipo_cambio_bna_vendedor))
-
-   # print("Predicted values: " + str(predicted_values))
-    return  str(predicted_values)
+    jsonStr = json.dumps([obj.__dict__ for obj in predicted_values])
+   
+    return jsonStr
+    
+   # return str([obj.__dict__ for obj in predicted_values])
+    #str(predicted_values)
 
     #pyplot.title("Historico")
     #pyplot.plot(data.tipo_cambio_bna_vendedor)

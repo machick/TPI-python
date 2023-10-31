@@ -54,11 +54,12 @@ async def create_item(item: dict):
 
 @app.get("/dolar/")
 async def get_dolar():
-    return {"dolar": dolar.getDollar()}
+    parsed_response = json.loads(dolar.getDolar())
+    return {"dolar":parsed_response}
 
 @app.get("/dolar-training/")
 async def get_dolar_training():
-    return {dolar.getDollarTraining()}
+    return {dolar.getDolarTraining()}
 
 @app.get("/saludo/")
 async def getSaludo():

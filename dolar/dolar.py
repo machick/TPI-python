@@ -85,7 +85,7 @@ def getDolar():
     data = pd.read_csv("./dolar.csv")
     data['futuro_rofex_usd6m'] = data['futuro_rofex_usd6m'].fillna(data['futuro_rofex_usd6m'].median())
     last_predicted = data.futuro_rofex_usd6m.values[-4:]
-    n_values_to_predict = 7
+    n_values_to_predict = 4
 
     class Precio:
         def __init__(self, fecha, precio):
@@ -98,7 +98,7 @@ def getDolar():
         y = model.predict(x_input, verbose=0)
         print(y.flatten()[0])
         y_predicted =float(y.flatten()[0])
-        next_date = datetime.now() + timedelta(x)
+        next_date = datetime.now() + timedelta(x*7)
         date_ = next_date.strftime("%Y-%m-%d")
         precio = Precio(date_,y_predicted)
         predicted_values.append(precio)

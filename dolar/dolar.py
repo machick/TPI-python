@@ -7,8 +7,8 @@ from keras.layers import LSTM, Dense, Flatten, TimeDistributed, Conv1D, MaxPooli
 from keras.models import load_model
 from datetime import datetime, timedelta
 import json
-#import os
-#os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # data preparation
 def download_usd():

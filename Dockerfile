@@ -18,7 +18,7 @@ RUN pip install --no-cache-dir \
         keras \
         fastapi \
         uvicorn
-RUN pip install --upgrade fastapi pydantic typing-extensions
+RUN pip install --upgrade fastapi pydantic typing-extensions tensorflow-cpu keras
 
 EXPOSE 8000
 ENTRYPOINT uvicorn --host 0.0.0.0 main:app --reload --port 8000

@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+import pandas as pd
 from fastapi.middleware.cors import CORSMiddleware
 from dolar import dolar
 import json
@@ -44,7 +45,9 @@ async def get_initial():
 # Ruta para obtener todos los elementos
 @app.get("/items/")
 async def get_items():
-    return items
+    holas = []        
+    holas.append({"hola":"holasx","precio":5.2})
+    return {"dolar":holas}
 
 # Ruta para crear un nuevo elemento
 @app.post("/items/")
@@ -52,11 +55,21 @@ async def create_item(item: dict):
     items.append(item)
     return item
 
+@app.get("/actualizar-data/")
+async def updateData():
+    return dolar.updateCsv()
+
 @app.get("/dolar/")
 async def get_dolar():
     print("/dolar: try show dolar")
+    df = dolar.getDolarBlueHistory()[-5:]
+    jsonLastDolars = df.to_json(orient='records')
+    json_list = pd.read_json(jsonLastDolars).to_dict(orient='records')
+    arrayDolarHistorico = []
+    for item in json_list:
+        arrayDolarHistorico.append({"fecha":item["day"],"precio":item["value_sell"]})
     parsed_response = json.loads(dolar.getDolar())
-    return {"dolar":parsed_response}
+    return {"dolar":arrayDolarHistorico + parsed_response}
 
 @app.get("/dolar-training/")
 async def get_dolar_training():

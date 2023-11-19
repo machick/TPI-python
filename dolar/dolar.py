@@ -37,16 +37,31 @@ def split_sequence(sequence, n_steps):
 
 # download most recent data from datos.gob.ar
 
+def updateCsv():
+    url = 'https://api.bluelytics.com.ar/v2/evolution.csv'
+    r = requests.get(url)
+    with open('dolar.csv', 'wb') as f:
+        f.write(r.content)
+    return {"message": "Datos dolar actualizados"}
+
+def getDolarBlueHistory():
+    print("INICIO getDolarBlueHistory")
+    data = pd.read_csv("./dolar.csv").iloc[::-1]
+    _filter = data["type"].isin(["Blue"])
+    print("FIN getDolarBlueHistory")            
+    return data[_filter]
 
 def getSaludo():
     download_usd()
     return {"dolar": "Hola soy el dolar"}
 
 def getDolarTraining():
-    data = pd.read_csv("./dolar.csv")
-    data['futuro_rofex_usd6m'] = data['futuro_rofex_usd6m'].fillna(data['futuro_rofex_usd6m'].median())
-    historic_data = data.futuro_rofex_usd6m.values[:-20]
-
+    data = getDolarBlueHistory()
+    print("INICIO getDolarTraining")
+    data['value_sell'] = data['value_sell'].fillna(data['value_sell'].median())
+    historic_data = data.value_sell.values[:-20]
+    print("historic_data")
+    print(historic_data)
     # choose a number of time steps
     n_steps = 4
 
@@ -73,10 +88,11 @@ def getDolarTraining():
     # model training
     model.fit(X, y, epochs=n_epochs, verbose=0)
     model.save('dolar_model')
-
+    print("FIN getDolarTraining")
     return str("Entrenamiento Finalizado")
 
 def getDolar():
+    print("INICIO getDolar")
     n_features = 1
     n_seq = 2
     n_steps = 2
@@ -84,10 +100,12 @@ def getDolar():
     model = load_model('dolar_model')
     # predict dolar 🐬
     predicted_values = []
-    data = pd.read_csv("./dolar.csv")
-    data['futuro_rofex_usd6m'] = data['futuro_rofex_usd6m'].fillna(data['futuro_rofex_usd6m'].median())
-    last_predicted = data.futuro_rofex_usd6m.values[-4:]
-    n_values_to_predict = 4
+    data = getDolarBlueHistory()
+    last_predicted = data['value_sell'].fillna(data['value_sell'].median())
+    last_predicted = data.value_sell.values[-4:]
+    print('last_predicted')
+    print(last_predicted)
+    n_values_to_predict = 5
 
     class Precio:
         def __init__(self, fecha, precio):
@@ -95,12 +113,10 @@ def getDolar():
             self.precio = precio
 
     for x in range(n_values_to_predict):
-        print(last_predicted)
         x_input = last_predicted.reshape((1, n_seq, n_steps, n_features))
         y = model.predict(x_input, verbose=0)
-        print(y.flatten()[0])
         y_predicted =float(y.flatten()[0])
-        next_date = datetime.now() + timedelta(x*7)
+        next_date = datetime.now() + timedelta(x)
         date_ = next_date.strftime("%Y-%m-%d")
         precio = Precio(date_,y_predicted)
         predicted_values.append(precio)
@@ -109,8 +125,9 @@ def getDolar():
         last_predicted = last_predicted[1:]
         last_predicted = numpy.append(last_predicted, [y])
 
+    print(last_predicted)
     jsonStr = json.dumps([obj.__dict__ for obj in predicted_values])
-   
+    print("FIN getDolar")
     return jsonStr
     
    # return str([obj.__dict__ for obj in predicted_values])
